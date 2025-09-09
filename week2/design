@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .selection-panel {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        select, button {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        select {
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        button {
+            background: #ff6b6b;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .results-panel {
+            flex: 2;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .result-header {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .movies-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .movie-card {
+            width: 180px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .movie-poster {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .movie-info {
+            padding: 15px;
+        }
+        
+        .movie-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            height: 40px;
+            overflow: hidden;
+        }
+        
+        .movie-genres {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            height: 60px;
+            overflow: hidden;
+        }
+        
+        .selected-movie {
+            border: 3px solid #ff6b6b;
+        }
+        
+        .recommended-movie {
+            border: 3px solid #4ecdc4;
+        }
+        
+        .status-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .highlight {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-film"></i> CineMatch</h1>
+            <p class="tagline">Discover your next favorite movie based on what you love</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="selection-panel">
+                <h2 class="panel-title">Select Your Movie</h2>
+                <div class="form-group">
+                    <label for="movie-select"><i class="fas fa-star"></i> Choose a movie you like:</label>
+                    <select id="movie-select">
+                        <option value="">-- Select a Movie --</option>
+                        <option value="1">The Shawshank Redemption</option>
+                        <option value="2">The Godfather</option>
+                        <option value="3">The Dark Knight</option>
+                        <option value="4">Pulp Fiction</option>
+                        <option value="5">Forrest Gump</option>
+                    </select>
+                </div>
+                <button id="recommend-btn">Get Recommendations <i class="fas fa-arrow-right"></i></button>
+            </div>
+            
+            <div class="results-panel">
+                <h2 class="result-header">Recommended For You</h2>
+                <div id="result-box">
+                    <p class="status-message">Select a movie to get recommendations</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Movie Recommendation System &copy; 2023 | Content-Based Filtering with Jaccard Similarity</p>
+        </footer>
+    </div>
+
+    <script>
+        // Sample movie data with images
+        const movies = [
+            {
+                id: 1,
+                title: "The Shawshank Redemption",
+                genres: ["Drama"],
+                poster: "https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_FMjpg_UX1000_.jpg"
+            },
+            {
+                id: 2,
+                title: "The Godfather",
+                genres: ["Crime", "Drama"],
+                poster: "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg"
+            },
+            {
+                id: 3,
+                title: "The Dark Knight",
+                genres: ["Action", "Crime", "Drama"],
+                poster: "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_FMjpg_UX1000_.jpg"
+            },
+            {
+                id: 4,
+                title: "Pulp Fiction",
+                genres: ["Crime", "Drama"],
+                poster: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzJjNDymxYzM5M2Y1XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg"
+            },
+            {
+                id: 5,
+                title: "Forrest Gump",
+                genres: ["Drama", "Romance"],
+                poster: "https://m.media-amazon.com/images/M/MV5BNWIwODRlZTUtY2U3ZS00Yzg1LWJhNzYtMmZiYmEyNmU1NjMzXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_FMjpg_UX1000_.jpg"
+            },
+            {
+                id: 6,
+                title: "Inception",
+                genres: ["Action", "Adventure", "Sci-Fi"],
+                poster: "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_FMjpg_UX1000_.jpg"
+            },
+            {
+                id: 7,
+                title: "The Matrix",
+                genres: ["Action", "Sci-Fi"],
+                poster: "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_FMjpg_UX1000_.jpg"
+            },
+            {
+                id: 8,
+                title: "Goodfellas",
+                genres: ["Biography", "Crime", "Drama"],
+                poster: "https://m.media-amazon.com/images/M/MV5BY2NkZjEzMDgtN2RjYy00YzM1LWI4ZmQtMjIwYjFjNmI3ZGEwXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg"
+            }
+        ];
+
+        // DOM elements
+        const movieSelect = document.getElementById('movie-select');
+        const recommendBtn = document.getElementById('recommend-btn');
+        const resultBox = document.getElementById('result-box');
+
+        // Event listeners
+        recommendBtn.addEventListener('click', getRecommendations);
+
+        // Function to get recommendations
+        function getRecommendations() {
+            const selectedMovieId = parseInt(movieSelect.value);
+            
+            if (!selectedMovieId) {
+                resultBox.innerHTML = '<p class="status-message">Please select a movie first</p>';
+                return;
+            }
+            
+            // Find the selected movie
+            const selectedMovie = movies.find(movie => movie.id === selectedMovieId);
+            
+            if (!selectedMovie) {
+                resultBox.innerHTML = '<p class="status-message">Movie not found. Please try another selection.</p>';
+                return;
+            }
+            
+            // Display loading message
+            resultBox.innerHTML = '<p class="status-message">Finding recommendations for <span class="highlight">' + selectedMovie.title + '</span>...</p>';
+            
+            // Simulate loading delay
+            setTimeout(() => {
+                // Calculate recommendations (in a real app, this would use Jaccard similarity)
+                const recommendations = getSimilarMovies(selectedMovie);
+                
+                // Display results
+                displayResults(selectedMovie, recommendations);
+            }, 1000);
+        }
+        
+        // Function to find similar movies (simplified for demo)
+        function getSimilarMovies(selectedMovie) {
+            // In a real application, this would use Jaccard similarity on genres
+            // For this demo, we'll just return some hardcoded recommendations
+            const recommendationMap = {
+                1: [5, 2, 8],   // Shawshank -> Forrest Gump, Godfather, Goodfellas
+                2: [8, 4, 1],   // Godfather -> Goodfellas, Pulp Fiction, Shawshank
+                3: [6, 7, 4],   // Dark Knight -> Inception, Matrix, Pulp Fiction
+                4: [2, 8, 3],   // Pulp Fiction -> Godfather, Goodfellas, Dark Knight
+                5: [1, 4, 6]    // Forrest Gump -> Shawshank, Pulp Fiction, Inception
+            };
+            
+            const recommendedIds = recommendationMap[selectedMovie.id] || [6, 7, 8];
+            return movies.filter(movie => recommendedIds.includes(movie.id));
+        }
+        
+        // Function to display results
+        function displayResults(selectedMovie, recommendations) {
+            let html = `
+                <div class="selected-movie-section">
+                    <p class="status-message">Because you liked <span class="highlight">${selectedMovie.title}</span>, we recommend:</p>
+                    <div class="movies-container">
+            `;
+            
+            // Add recommended movies
+            recommendations.forEach(movie => {
+                html += `
+                    <div class="movie-card recommended-movie">
+                        <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
+                        <div class="movie-info">
+                            <div class="movie-title">${movie.title}</div>
+                            <div class="movie-genres">${movie.genres.join(", ")}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            resultBox.innerHTML = html;
+        }
+        
+        // Initialize the app
+        function init() {
+            // Populate the dropdown with movies
+            movies.forEach(movie => {
+                const option = document.createElement('option');
+                option.value = movie.id;
+                option.textContent = movie.title;
+                movieSelect.appendChild(option);
+            });
+        }
+        
+        // Run initialization when page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
